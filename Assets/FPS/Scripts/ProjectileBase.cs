@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.Events;
-
+//TODO: POTENTIAL CHANGING OF INITIAL POSITION/VELOCITY
 public class ProjectileBase : MonoBehaviour
 {
     public GameObject owner { get; private set; }

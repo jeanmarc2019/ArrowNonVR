@@ -108,8 +108,11 @@ public class ProjectileStandard : MonoBehaviour
 
     void Update()
     {
+    //TODO: CHANGE UPDATED POSITION HERE
         // Move
-        transform.position += m_Velocity * Time.deltaTime;
+        Vector3 circleModifier = new Vector3((90-Vector3.Angle(new Vector3(1f,0f,0f), m_ProjectileBase.initialDirection)) * Mathf.Sin(Time.deltaTime)*100, 0, (90-Vector3.Angle(new Vector3(1f,0f,0f), m_ProjectileBase.initialDirection)) * Mathf.Cos(Time.deltaTime)*100);
+        Debug.Log(circleModifier);
+        transform.position += (m_Velocity + circleModifier) * Time.deltaTime;
         if (inheritWeaponVelocity)
         {
             transform.position += m_ProjectileBase.inheritedMuzzleVelocity * Time.deltaTime;
@@ -138,11 +141,11 @@ public class ProjectileStandard : MonoBehaviour
         transform.forward = m_Velocity.normalized;
 
         // Gravity
-        if (gravityDownAcceleration > 0)
-        {
-            // add gravity to the projectile velocity for ballistic effect
-            m_Velocity += Vector3.down * gravityDownAcceleration * Time.deltaTime;
-        }
+//        if (gravityDownAcceleration > 0)
+//        {
+//            // add gravity to the projectile velocity for ballistic effect
+//            m_Velocity += Vector3.down * gravityDownAcceleration * Time.deltaTime;
+//        }
 
         // Hit detection
         {
