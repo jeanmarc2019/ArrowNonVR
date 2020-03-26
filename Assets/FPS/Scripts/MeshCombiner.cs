@@ -35,10 +35,10 @@ public class MeshCombiner : MonoBehaviour
                 }
             }
         }
-        else
-        {
-            MeshCombineUtility.Combine(validRenderers, MeshCombineUtility.RendererDisposeMethod.DestroyRendererAndFilter, "Level_Combined");
-        }
+//        else
+//        {
+//            MeshCombineUtility.Combine(validRenderers, MeshCombineUtility.RendererDisposeMethod.DestroyRendererAndFilter, "Level_Combined");
+//        }
     }
 
     void CombineAllInBounds(Bounds bounds, List<MeshRenderer> validRenderers)
@@ -55,10 +55,10 @@ public class MeshCombiner : MonoBehaviour
             }
         } 
 
-        if (renderersForThisCell.Count > 0)
-        {
-            MeshCombineUtility.Combine(renderersForThisCell, MeshCombineUtility.RendererDisposeMethod.DestroyRendererAndFilter, "Level_Combined");
-        }
+//        if (renderersForThisCell.Count > 0)
+//        {
+//            MeshCombineUtility.Combine(renderersForThisCell, MeshCombineUtility.RendererDisposeMethod.DestroyRendererAndFilter, "Level_Combined");
+//        }
     }
 
     int GetGridCellCount()

@@ -280,6 +280,7 @@ public class WeaponController : MonoBehaviour
         for (int i = 0; i < bulletsPerShot; i++)
         {
             Vector3 shotDirection = GetShotDirectionWithinSpread(weaponMuzzle);
+//            TODO: GET EULER ANGLE X (MAYBE Y OR Z IDK) FROM HERE
             ProjectileBase newProjectile = Instantiate(projectilePrefab, weaponMuzzle.position, Quaternion.LookRotation(shotDirection));
             newProjectile.Shoot(this);
         }
