@@ -184,17 +184,17 @@ MonoBehaviour:
     crosshairColor: {r: 0, g: 0, b: 0, a: 0}
   weaponRoot: {fileID: 6794168443199562161}
   weaponMuzzle: {fileID: 8836340282877979759}
-  shootType: 0
+  shootType: 1
   projectilePrefab: {fileID: 114315771298185244, guid: 0cf214b09fa24456d8865a3bf5bb134e,
     type: 3}
-  delayBetweenShots: 0.5
+  delayBetweenShots: 0.2
   bulletSpreadAngle: 0
   bulletsPerShot: 1
   recoilForce: 1
   aimZoomRatio: 1
   aimOffset: {x: 0, y: 0, z: 0}
-  ammoReloadRate: 1
-  ammoReloadDelay: 2
+  ammoReloadRate: 10000
+  ammoReloadDelay: 0
   maxAmmo: 8
   maxChargeDuration: 2
   ammoUsedOnStartCharge: 1
