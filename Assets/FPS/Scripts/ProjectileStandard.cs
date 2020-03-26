@@ -128,9 +128,9 @@ public class ProjectileStandard : MonoBehaviour
              );
 //        Vector3 circleModifier = new Vector3(circleRadius*(Mathf.Cos(time_since_release) - 1), initialElevatedAim * time_since_release, circleRadius*(Mathf.Sin(time_since_release)));
         Vector3 anotherVector = new Vector3(
-            Mathf.Cos(-1*angleBetweenXandZ)*circleModifier.x - Mathf.Sin(-1*angleBetweenXandZ)*circleModifier.z,
+            Mathf.Cos(-1*angleBetweenXandZ)*circleModifier.z - Mathf.Sin(-1*angleBetweenXandZ)*circleModifier.x,
             circleModifier.y,
-            Mathf.Sin(-1*angleBetweenXandZ)*circleModifier.x + Mathf.Cos(-1*angleBetweenXandZ)*circleModifier.z
+            Mathf.Sin(-1*angleBetweenXandZ)*circleModifier.z + Mathf.Cos(-1*angleBetweenXandZ)*circleModifier.x
         );
 
 //        Vector3 circleModifier = new Vector3(Mathf.Cos(time_since_release) - 1, 0, Mathf.Sin(time_since_release)); base idea
@@ -148,7 +148,7 @@ public class ProjectileStandard : MonoBehaviour
 //            m_ProjectileBase.initialDirection.y * time_since_release + (Mathf.Pow(r,2)/2)*(m_ProjectileBase.initialDirection.y * time_since_release - Mathf.Sin(m_ProjectileBase.initialDirection.y * time_since_release)),
 //            r * (Mathf.Cos(2 * m_ProjectileBase.initialDirection.y * time_since_release) - 1)
 //        );
-        transform.position = m_ProjectileBase.initialPosition + circleModifier;
+        transform.position = m_ProjectileBase.initialPosition + anotherVector;
 
         if (inheritWeaponVelocity)
         {
