@@ -12,11 +12,11 @@ public class ProjectileStandard : MonoBehaviour
     [Tooltip("Transform representing the tip of the projectile (used for accurate collision detection)")]
     public Transform tip;
     [Tooltip("LifeTime of the projectile")]
-    public float maxLifeTime = 5f;
+    public float maxLifeTime = 10000000f;
     [Tooltip("VFX prefab to spawn upon impact")]
     public GameObject impactVFX;
     [Tooltip("LifeTime of the VFX before being destroyed")]
-    public float impactVFXLifetime = 5f;
+    public float impactVFXLifetime = 10000000f;
     [Tooltip("Offset along the hit normal where the VFX will be spawned")]
     public float impactVFXSpawnOffset = 0.1f;
     [Tooltip("Clip to play on impact")]
@@ -54,6 +54,15 @@ public class ProjectileStandard : MonoBehaviour
     List<Collider> m_IgnoredColliders;
 
     const QueryTriggerInteraction k_TriggerInteraction = QueryTriggerInteraction.Collide;
+
+
+    private Vector3 NilMultiply(Vector3 left, Vector3 right)
+
+    {
+    Vector3 normalsum = new Vector3(left.x + right.x, left.y + right.y + 0.5f * (left.x * right.z - left.z * right.x), left.z + right.z);
+    return normalsum;
+
+    }
 
     private void OnEnable()
     {
@@ -108,8 +117,34 @@ public class ProjectileStandard : MonoBehaviour
 
     void Update()
     {
+         float time_since_release = Time.time - m_ShootTime;
+    //TODO: CHANGE UPDATED POSITION HERE (also look up rotation matrices, 3D rotations and mult by quaternion, geodesic)
         // Move
-        transform.position += m_Velocity * Time.deltaTime;
+        float initialElevatedAim = m_ProjectileBase.initialDirection.y;
+        float circleRadius = 1/initialElevatedAim;
+        float angleBetweenXandZ = Mathf.Atan2(m_ProjectileBase.initialDirection.x, m_ProjectileBase.initialDirection.z);
+        Vector3 initial_position = m_ProjectileBase.initialPosition;
+
+
+
+        Vector3 r_2d = new Vector3(m_ProjectileBase.initialDirection.x, 0, m_ProjectileBase.initialDirection.z);
+        float r = r_2d.magnitude/(2*m_ProjectileBase.initialDirection.y);
+        Vector3 circleModifier = new Vector3(
+                 r * Mathf.Sin(2 * m_ProjectileBase.initialDirection.y * time_since_release),
+                 m_ProjectileBase.initialDirection.y * time_since_release + (Mathf.Pow(r,2)/2)*(m_ProjectileBase.initialDirection.y * time_since_release - Mathf.Sin(m_ProjectileBase.initialDirection.y * time_since_release)),
+                 r * (Mathf.Cos(2 * m_ProjectileBase.initialDirection.y * time_since_release) - 1)
+             );
+
+        Vector3 anotherVector = new Vector3(
+            Mathf.Cos(-1*angleBetweenXandZ)*circleModifier.z - Mathf.Sin(-1*angleBetweenXandZ)*circleModifier.x,
+            circleModifier.y,
+            Mathf.Sin(-1*angleBetweenXandZ)*circleModifier.z + Mathf.Cos(-1*angleBetweenXandZ)*circleModifier.x
+        );
+
+                Debug.Log(angleBetweenXandZ);
+
+        transform.position = NilMultiply(m_ProjectileBase.initialPosition, anotherVector);
+
         if (inheritWeaponVelocity)
         {
             transform.position += m_ProjectileBase.inheritedMuzzleVelocity * Time.deltaTime;
@@ -135,14 +170,14 @@ public class ProjectileStandard : MonoBehaviour
         }
 
         // Orient towards velocity
-        transform.forward = m_Velocity.normalized;
+        transform.forward = anotherVector;
 
         // Gravity
-        if (gravityDownAcceleration > 0)
-        {
-            // add gravity to the projectile velocity for ballistic effect
-            m_Velocity += Vector3.down * gravityDownAcceleration * Time.deltaTime;
-        }
+//        if (gravityDownAcceleration > 0)
+//        {
+//            // add gravity to the projectile velocity for ballistic effect
+//            m_Velocity += Vector3.down * gravityDownAcceleration * Time.deltaTime;
+//        }
 
         // Hit detection
         {
