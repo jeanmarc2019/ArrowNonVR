@@ -1,0 +1,22 @@
+{
+    "name": "Unity.ProBuilder.Editor.Tests",
+    "references": [
+        "Unity.ProBuilder.Tests.Framework",
+        "Unity.ProBuilder",
+        "Unity.ProBuilder.Editor",
+        "Unity.ProBuilder.Stl",
+        "Unity.Settings.Editor"
+    ],
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": []
+}
