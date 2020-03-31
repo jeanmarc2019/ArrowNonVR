@@ -55,6 +55,15 @@ public class ProjectileStandard : MonoBehaviour
 
     const QueryTriggerInteraction k_TriggerInteraction = QueryTriggerInteraction.Collide;
 
+
+    private Vector3 NilMultiply(Vector3 left, Vector3 right)
+
+    {
+    Vector3 normalsum = new Vector3(left.x + right.x, left.y + right.y + 0.5f * (left.x * right.z - left.z * right.x), left.z + right.z);
+    return normalsum;
+
+    }
+
     private void OnEnable()
     {
         m_ProjectileBase = GetComponent<ProjectileBase>();
@@ -111,14 +120,13 @@ public class ProjectileStandard : MonoBehaviour
          float time_since_release = Time.time - m_ShootTime;
     //TODO: CHANGE UPDATED POSITION HERE (also look up rotation matrices, 3D rotations and mult by quaternion, geodesic)
         // Move
-//        r = mag(Vector3(r.x, 0, r.z))/(2*r.y)
-//pos = Vector3(r Sin(r.y * t), r.y * t + (r^2/2)(r.y * t - sin(r.y * t)), r*(cos(2r.y* t) - 1));
         float initialElevatedAim = m_ProjectileBase.initialDirection.y;
         float circleRadius = 1/initialElevatedAim;
         float angleBetweenXandZ = Mathf.Atan2(m_ProjectileBase.initialDirection.x, m_ProjectileBase.initialDirection.z);
-//        float angleBetweenXandZ = Vector3.Angle(m_ProjectileBase.initialDirection.x, m_ProjectileBase.initialDirection.z);
+        Vector3 initial_position = m_ProjectileBase.initialPosition;
 
-//        float angle = Vector3.Angle(new Vector3(1f,0f,0f), m_ProjectileBase.initialDirection);
+
+
         Vector3 r_2d = new Vector3(m_ProjectileBase.initialDirection.x, 0, m_ProjectileBase.initialDirection.z);
         float r = r_2d.magnitude/(2*m_ProjectileBase.initialDirection.y);
         Vector3 circleModifier = new Vector3(
@@ -126,29 +134,16 @@ public class ProjectileStandard : MonoBehaviour
                  m_ProjectileBase.initialDirection.y * time_since_release + (Mathf.Pow(r,2)/2)*(m_ProjectileBase.initialDirection.y * time_since_release - Mathf.Sin(m_ProjectileBase.initialDirection.y * time_since_release)),
                  r * (Mathf.Cos(2 * m_ProjectileBase.initialDirection.y * time_since_release) - 1)
              );
-//        Vector3 circleModifier = new Vector3(circleRadius*(Mathf.Cos(time_since_release) - 1), initialElevatedAim * time_since_release, circleRadius*(Mathf.Sin(time_since_release)));
+
         Vector3 anotherVector = new Vector3(
             Mathf.Cos(-1*angleBetweenXandZ)*circleModifier.z - Mathf.Sin(-1*angleBetweenXandZ)*circleModifier.x,
             circleModifier.y,
             Mathf.Sin(-1*angleBetweenXandZ)*circleModifier.z + Mathf.Cos(-1*angleBetweenXandZ)*circleModifier.x
         );
 
-//        Vector3 circleModifier = new Vector3(Mathf.Cos(time_since_release) - 1, 0, Mathf.Sin(time_since_release)); base idea
-//        Debug.Log(time_since_release);
-//                Debug.Log(circleModifier);
                 Debug.Log(angleBetweenXandZ);
-//                Debug.Log(transform.Rotate(new Vector3(-1*transform.position.y,,0f))
-//                transform.Rotate(new Vector3(1f,0f,0f)
 
-//        circlemodifier to compute new position directly
-//        transform.position += (m_Velocity + circleModifier) * Time.deltaTime;
-
-//        transform.position += new Vector3(
-//            r * Mathf.Sin(2 * m_ProjectileBase.initialDirection.y * time_since_release),
-//            m_ProjectileBase.initialDirection.y * time_since_release + (Mathf.Pow(r,2)/2)*(m_ProjectileBase.initialDirection.y * time_since_release - Mathf.Sin(m_ProjectileBase.initialDirection.y * time_since_release)),
-//            r * (Mathf.Cos(2 * m_ProjectileBase.initialDirection.y * time_since_release) - 1)
-//        );
-        transform.position = m_ProjectileBase.initialPosition + anotherVector;
+        transform.position = NilMultiply(m_ProjectileBase.initialPosition, anotherVector);
 
         if (inheritWeaponVelocity)
         {
