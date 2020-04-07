@@ -59,7 +59,7 @@ public class ProjectileStandard : MonoBehaviour
     private Vector3 NilMultiply(Vector3 left, Vector3 right)
 
     {
-    Vector3 normalsum = new Vector3(left.x + right.x, left.y + right.y + 0.5f * (left.x * right.z - left.z * right.x), left.z + right.z);
+    Vector3 normalsum = new Vector3(left.x + right.x, left.y + right.y + 2f * (left.x * right.z - left.z * right.x), left.z + right.z);
     return normalsum;
 
     }
@@ -71,7 +71,7 @@ public class ProjectileStandard : MonoBehaviour
 
         m_ProjectileBase.onShoot += OnShoot;
 
-        Destroy(gameObject, maxLifeTime);
+       // Destroy(gameObject, maxLifeTime);
     }
 
     void OnShoot()
