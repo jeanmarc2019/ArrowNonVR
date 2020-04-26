@@ -164,7 +164,7 @@ namespace Photon.Pun.Demo.PunBasics
 
 			Debug.LogFormat( "PhotonNetwork : Loading Level : {0}", PhotonNetwork.CurrentRoom.PlayerCount );
 
-			PhotonNetwork.LoadLevel("SecondaryScene");
+			PhotonNetwork.LoadLevel(1);
 		}
 
 		#endregion
