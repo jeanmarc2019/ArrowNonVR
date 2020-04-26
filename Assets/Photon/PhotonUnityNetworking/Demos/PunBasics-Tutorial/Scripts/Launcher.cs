@@ -75,6 +75,11 @@ namespace Photon.Pun.Demo.PunBasics
 			PhotonNetwork.AutomaticallySyncScene = true;
 
 		}
+//		 void Start()
+//                {
+//                    Connect();
+//                }
+
 
 		#endregion
 
@@ -96,7 +101,7 @@ namespace Photon.Pun.Demo.PunBasics
 			isConnecting = true;
 
 			// hide the Play button for visual consistency
-			controlPanel.SetActive(false);
+			//controlPanel.SetActive(false);
 
 			// start the loader animation for visual effect.
 			if (loaderAnime!=null)
@@ -159,6 +164,7 @@ namespace Photon.Pun.Demo.PunBasics
 		
 				// #Critical: The first we try to do is to join a potential existing room. If there is, good, else, we'll be called back with OnJoinRandomFailed()
 				PhotonNetwork.JoinRandomRoom();
+				isConnecting = false;
 			}
 		}
 
@@ -190,7 +196,7 @@ namespace Photon.Pun.Demo.PunBasics
 			loaderAnime.StopLoaderAnimation();
 
 			isConnecting = false;
-			controlPanel.SetActive(true);
+			//controlPanel.SetActive(true);
 
 		}
 
@@ -217,12 +223,12 @@ namespace Photon.Pun.Demo.PunBasics
 
 				// #Critical
 				// Load the Room Level. 
-				PhotonNetwork.LoadLevel("MainScene*");
+				PhotonNetwork.LoadLevel(1);
 
 			}
 		}
 
 		#endregion
-		
+
 	}
 }
