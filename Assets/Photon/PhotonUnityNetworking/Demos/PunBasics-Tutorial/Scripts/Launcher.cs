@@ -75,11 +75,12 @@ namespace Photon.Pun.Demo.PunBasics
 			PhotonNetwork.AutomaticallySyncScene = true;
 
 		}
-//		 void Start()
-//                {
+//        void Start()
+//         {
 //                    Connect();
-//                }
-
+//                    progressLabel.SetActive(false);
+//                    controlPanel.SetActive(true);
+//         }
 
 		#endregion
 
