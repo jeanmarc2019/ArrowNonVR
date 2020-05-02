@@ -6,7 +6,7 @@ namespace GeometryMapper
 {
     class PhysicsHelper
     {
-        public static string currentGeometry = "Nil"; // default is Euclidean geometry
+        public static string currentGeometry = ""; // default is Euclidean geometry
 
         public static void changeGeometry(String geometry)
         {
