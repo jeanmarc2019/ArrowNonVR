@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using GeometryMapper;
 
 [RequireComponent(typeof(ProjectileBase))]
 public class ProjectileStandard : MonoBehaviour
@@ -55,15 +56,6 @@ public class ProjectileStandard : MonoBehaviour
 
     const QueryTriggerInteraction k_TriggerInteraction = QueryTriggerInteraction.Collide;
 
-
-    private Vector3 NilMultiply(Vector3 left, Vector3 right)
-
-    {
-    Vector3 normalsum = new Vector3(left.x + right.x, left.y + right.y + 2f * (left.x * right.z - left.z * right.x), left.z + right.z);
-    return normalsum;
-
-    }
-
     private void OnEnable()
     {
         m_ProjectileBase = GetComponent<ProjectileBase>();
@@ -117,33 +109,14 @@ public class ProjectileStandard : MonoBehaviour
 
     void Update()
     {
-         float time_since_release = Time.time - m_ShootTime;
-    //TODO: CHANGE UPDATED POSITION HERE (also look up rotation matrices, 3D rotations and mult by quaternion, geodesic)
-        // Move
-        float initialElevatedAim = m_ProjectileBase.initialDirection.y;
-        float circleRadius = 1/initialElevatedAim;
-        float angleBetweenXandZ = Mathf.Atan2(m_ProjectileBase.initialDirection.x, m_ProjectileBase.initialDirection.z);
-        Vector3 initial_position = m_ProjectileBase.initialPosition;
-
-
-
-        Vector3 r_2d = new Vector3(m_ProjectileBase.initialDirection.x, 0, m_ProjectileBase.initialDirection.z);
-        float r = r_2d.magnitude/(2*m_ProjectileBase.initialDirection.y);
-        Vector3 circleModifier = new Vector3(
-                 r * Mathf.Sin(2 * m_ProjectileBase.initialDirection.y * time_since_release),
-                 m_ProjectileBase.initialDirection.y * time_since_release + (Mathf.Pow(r,2)/2)*(m_ProjectileBase.initialDirection.y * time_since_release - Mathf.Sin(m_ProjectileBase.initialDirection.y * time_since_release)),
-                 r * (Mathf.Cos(2 * m_ProjectileBase.initialDirection.y * time_since_release) - 1)
-             );
-
-        Vector3 anotherVector = new Vector3(
-            Mathf.Cos(-1*angleBetweenXandZ)*circleModifier.z - Mathf.Sin(-1*angleBetweenXandZ)*circleModifier.x,
-            circleModifier.y,
-            Mathf.Sin(-1*angleBetweenXandZ)*circleModifier.z + Mathf.Cos(-1*angleBetweenXandZ)*circleModifier.x
+        float time_since_release = Time.time - m_ShootTime;
+        var mapperOutputs = GeometryMapper.PhysicsHelper.mapper(
+            m_ProjectileBase.initialPosition,
+            m_ProjectileBase.initialDirection,
+            time_since_release
         );
 
-                Debug.Log(angleBetweenXandZ);
-
-        transform.position = NilMultiply(m_ProjectileBase.initialPosition, anotherVector);
+        transform.position = mapperOutputs.mappedPosition;
 
         if (inheritWeaponVelocity)
         {
@@ -170,7 +143,7 @@ public class ProjectileStandard : MonoBehaviour
         }
 
         // Orient towards velocity
-        transform.forward = anotherVector;
+        transform.forward = mapperOutputs.mappedDirection;
 
         // Gravity
 //        if (gravityDownAcceleration > 0)
