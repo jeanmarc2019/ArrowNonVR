@@ -152,7 +152,11 @@ public class ProjectileStandard : MonoBehaviour
         }
 
         // Orient towards velocity
-        transform.forward = new Vector3(1f,0f,0f); //TODO: take derivative of position to get this reliably
+        transform.forward = GeometryMapper.PhysicsHelper.derivateApprox(
+            m_ProjectileBase.initialPosition,
+            m_ProjectileBase.initialDirection,
+            time_since_release
+        );
 
         // Gravity
 //        if (gravityDownAcceleration > 0)

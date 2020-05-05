@@ -36,7 +36,7 @@ namespace GeometryMapper
         }
         public static float angleFromDirection(Vector3 direction)
         {
-            return (float)Mathf.Atan2(direction.x, direction.z);
+            return (float)Mathf.Atan2(direction.z, direction.x);
         }
         public static Vector3 ArrowFromOrigin(Vector3 input, float t)
         {
@@ -59,6 +59,13 @@ namespace GeometryMapper
                     t
                 )
             );
+        }
+        public static Vector3 derivateApprox(Vector3 position, Vector3 direction, float t)
+        {
+            Vector3 f_of_x_plus_h = ArrowFromElsewhere(position, direction, t + Time.deltaTime);
+            Vector3 f_of_x = ArrowFromElsewhere(position, direction, t);
+            float h = Time.deltaTime;
+            return (f_of_x_plus_h - f_of_x)/h;
         }
     }
 }
