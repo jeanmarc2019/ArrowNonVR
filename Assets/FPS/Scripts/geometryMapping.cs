@@ -46,7 +46,7 @@ namespace GeometryMapper
         {
             Vector3 normalsum = new Vector3(
                 left.x + right.x,
-                left.y + right.y - (left.x * right.z - left.z * right.x),
+                left.y + right.y + (left.x * right.z - left.z * right.x),
                 left.z + right.z
             );
             return normalsum;
