@@ -68,6 +68,16 @@ public class ProjectileStandard : MonoBehaviour
 
     void OnShoot()
     {
+        // Sanity check, shooting an arrow from the origin down the z-axis, aiming very slight up
+        Vector3 testDirection = new Vector3(0f,0.000000001f,1f);
+        Vector3 testPosition = new Vector3(0f,0f,0f);
+        Vector3 testArrow = GeometryMapper.PhysicsHelper.ArrowFromElsewhere(testPosition, testDirection/testDirection.magnitude, 10f);
+
+        Debug.Log(testArrow); // this blows off in the wrong direction
+        Debug.Log(testDirection.magnitude); // is 1, so it is a unit vector
+        Debug.Log(GeometryMapper.PhysicsHelper.angleFromDirection(testDirection)); // this returns 0
+        Debug.Log(Mathf.PI/2); // this is the value of the exact same function arctan in Mathematica
+
         m_ShootTime = Time.time;
         m_LastRootPosition = root.position;
         m_Velocity = transform.forward * speed;
@@ -110,13 +120,12 @@ public class ProjectileStandard : MonoBehaviour
     void Update()
     {
         float time_since_release = Time.time - m_ShootTime;
-        var mapperOutputs = GeometryMapper.PhysicsHelper.mapper(
+
+        transform.position = GeometryMapper.PhysicsHelper.ArrowFromElsewhere(
             m_ProjectileBase.initialPosition,
             m_ProjectileBase.initialDirection,
             time_since_release
         );
-
-        transform.position = mapperOutputs.mappedPosition;
 
         if (inheritWeaponVelocity)
         {
@@ -143,7 +152,11 @@ public class ProjectileStandard : MonoBehaviour
         }
 
         // Orient towards velocity
-        transform.forward = mapperOutputs.mappedDirection;
+        transform.forward = GeometryMapper.PhysicsHelper.derivateApprox(
+            m_ProjectileBase.initialPosition,
+            m_ProjectileBase.initialDirection,
+            time_since_release
+        );
 
         // Gravity
 //        if (gravityDownAcceleration > 0)

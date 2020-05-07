@@ -13,68 +13,59 @@ namespace GeometryMapper
             currentGeometry = geometry;
         }
 
-        // maps position in terms of the geometry geodesics and returns a tuple of the position and direction
-        public static (Vector3 mappedPosition, Vector3 mappedDirection) mapper(Vector3 position, Vector3 direction, float timeSinceRelease)
-        {
-            Vector3 newPosition; // new position in the update
-            Vector3 newDirection; // new direction to point the arrow
-            switch(currentGeometry) {
-                case "Nil":
-                    newDirection = ArrowFromOrigin(
-                        BringVelocityToOrigin(
-                            direction,
-                            position
-                        ),
-                        timeSinceRelease
-                    );
-                    newPosition = NilMultiply(
-                        position,
-                        newDirection
-                    );
-                    break;
-                default: // Euclidean
-                    newPosition = position + direction * timeSinceRelease;
-                    newDirection = direction;
-                    break;
-            }
-            return (newPosition, newDirection);
-        }
-
-        // helper functions for Nil
-        //----------------------------------------------------------------
         private static Vector3 NilMultiply(Vector3 left, Vector3 right)
         {
-            Vector3 normalsum = new Vector3(
+            Vector3 normalSum = new Vector3(
                 left.x + right.x,
-                left.y + right.y + (left.x * right.z - left.z * right.x),
+                left.y + right.y + (left.x*right.z - right.x*left.z),
                 left.z + right.z
             );
-            return normalsum;
+            return normalSum;
         }
-
-        // ensures path consistency no matter where the arrow is shot from
-        // takes advantage of the fact that the group law is a linear transformation
-        private static Vector3 BringVelocityToOrigin(Vector3 direction, Vector3 location)
+        private static Vector3 RussianArrowFromOrigin(float r, float varphi, float gamma, float t)
         {
-            return NilMultiply(-1*location, location + direction);
+            float x = (r/(2*gamma))*(Mathf.Sin(2*gamma*t + varphi) - Mathf.Sin(varphi));
+            float y = ((1+Mathf.Pow(gamma, 2f))/(2*gamma))*t - ((1 - Mathf.Pow(gamma, 2f))/(4*Mathf.Pow(gamma, 2f)))*Mathf.Sin(2*gamma*t);
+            float z = (r/(2*gamma))*(Mathf.Cos(varphi) - Mathf.Cos(2*gamma*t + varphi));
+            Vector3 output = new Vector3(x,y,z);
+            return output;
         }
-
-        // Note: direction here works because by default it is a vector3 with magnitude 1
-        // Would need to generalize this for non-normalized vector3
-        private static Vector3 ArrowFromOrigin(Vector3 direction, float t)
+        public static float aFromDirection(Vector3 direction)
         {
-            Vector3 r = new Vector3(
-                direction.x,
-                0,
-                direction.z
+            return (float)Math.Pow(Mathf.Pow(direction.x, 2f) + Mathf.Pow(direction.z, 2f), 0.5f);
+        }
+        public static float angleFromDirection(Vector3 direction)
+        {
+            return (float)Mathf.Atan2(direction.z, direction.x);
+        }
+        public static Vector3 ArrowFromOrigin(Vector3 input, float t)
+        {
+            return RussianArrowFromOrigin(aFromDirection(input), angleFromDirection(input), input.y, t);
+        }
+        private static Vector3 BringVelocityToOrigin(Vector3 velocity, Vector3 oldLocation)
+        {
+            return NilMultiply(-1*oldLocation, oldLocation + velocity);
+        }
+        private static Vector3 BeingVelocityToLocation(Vector3 velocity, Vector3 newLocation)
+        {
+            return -1*newLocation + NilMultiply(newLocation, velocity);
+        }
+        public static Vector3 ArrowFromElsewhere(Vector3 whereImShootingFrom, Vector3 whatDirectionImShooting, float t)
+        {
+            return NilMultiply(
+                whereImShootingFrom,
+                ArrowFromOrigin(
+                    BringVelocityToOrigin(whatDirectionImShooting, whereImShootingFrom),
+                    t
+                )
             );
-            float gamma = direction.y;
-            float varphi = Mathf.Atan2(direction.x,direction.z);
-            float x = (r.magnitude/(2*gamma))*(Mathf.Sin(2*gamma*t + varphi) - Mathf.Sin(varphi));
-            float y = ((1 + Mathf.Pow(gamma, 2f))/(2*gamma))*t - ((1 - Mathf.Pow(gamma, 2f))/(4*Mathf.Pow(gamma, 2f)))*Mathf.Sin(2*gamma*t);
-            float z = (r.magnitude/(2*gamma))*(Mathf.Cos(varphi) - Mathf.Cos(2*gamma*t + varphi));
-            Vector3 mapping = new Vector3(x,y,z);
-            return mapping;
+        }
+        public static Vector3 derivateApprox(Vector3 position, Vector3 direction, float t)
+        {
+            Vector3 f_of_x_plus_h = ArrowFromElsewhere(position, direction, t + Time.deltaTime);
+            Vector3 f_of_x = ArrowFromElsewhere(position, direction, t);
+            float h = Time.deltaTime;
+            return (f_of_x_plus_h - f_of_x)/h;
         }
     }
 }
