@@ -6,7 +6,7 @@ namespace GeometryMapper
 {
     class PhysicsHelper
     {
-        public static string currentGeometry = "Nil"; // default is Nil geometry
+        public static string currentGeometry = "Half-Plane"; // default is Nil geometry
 
         public static void changeGeometry(String geometry)
         {
@@ -50,20 +50,49 @@ namespace GeometryMapper
         {
             return -1*newLocation + NilMultiply(newLocation, velocity);
         }
-        public static Vector3 ArrowFromElsewhere(Vector3 whereImShootingFrom, Vector3 whatDirectionImShooting, float t)
+        private static Vector3 getRotationAxis(Vector3 input) {
+            Vector2 projected = new Vector2(input.x, input.z);
+            Vector2 orthogonal = Vector2.Perpendicular(projected);
+            return new Vector3(orthogonal.x, 0, orthogonal.y);
+        }
+        public static Vector3 positionMap(Vector3 whereImShootingFrom, Vector3 whatDirectionImShooting, float t)
         {
-            return NilMultiply(
-                whereImShootingFrom,
-                ArrowFromOrigin(
-                    BringVelocityToOrigin(whatDirectionImShooting, whereImShootingFrom),
-                    t
-                )
-            );
+
+            switch(currentGeometry) {
+                case "Nil":
+                    return NilMultiply(
+                        whereImShootingFrom,
+                        ArrowFromOrigin(
+                            BringVelocityToOrigin(whatDirectionImShooting, whereImShootingFrom),
+                            t
+                        )
+                    );
+                case "Half-Plane":
+                    Vector3 up =  ((Quaternion.AngleAxis(90, getRotationAxis(whatDirectionImShooting)) * whatDirectionImShooting)); // this might not be right idk
+                    float angleBetweenXandUp = Mathf.Acos(
+                        (Vector3.Dot(up, new Vector3(0,1,0)))/(up.magnitude)
+                    );
+                    Vector3 flatDir = new Vector3(whatDirectionImShooting.x, 0, whatDirectionImShooting.z);
+                    float radius = whatDirectionImShooting.y / Mathf.Cos(angleBetweenXandUp);
+
+                    float angleBetweenXandDir = Mathf.Acos(
+                        ((Vector3.Dot(flatDir, new Vector3(1,0,0)))/(flatDir.magnitude))
+                    );
+                    Vector3 velocityMapped = new Vector3(
+                      -1 * Mathf.Cos(angleBetweenXandDir) * Mathf.Cos(t),
+                      Mathf.Sin(t),
+                      -1 * Mathf.Sin(angleBetweenXandDir) * Mathf.Cos(t)
+                    );
+                    return whereImShootingFrom + (radius * t * velocityMapped);
+
+                default:
+                    return whereImShootingFrom + whatDirectionImShooting*t;
+            }
         }
         public static Vector3 derivateApprox(Vector3 position, Vector3 direction, float t)
         {
-            Vector3 f_of_x_plus_h = ArrowFromElsewhere(position, direction, t + Time.deltaTime);
-            Vector3 f_of_x = ArrowFromElsewhere(position, direction, t);
+            Vector3 f_of_x_plus_h = positionMap(position, direction, t + Time.deltaTime);
+            Vector3 f_of_x = positionMap(position, direction, t);
             float h = Time.deltaTime;
             return (f_of_x_plus_h - f_of_x)/h;
         }
