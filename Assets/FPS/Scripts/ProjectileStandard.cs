@@ -76,6 +76,7 @@ public class ProjectileStandard : MonoBehaviour
 
         // Ignore colliders of owner
         Collider[] ownerColliders = m_ProjectileBase.owner.GetComponentsInChildren<Collider>();
+        Debug.Log(m_ProjectileBase.owner.GetComponent<Collider>().bounds); // can be used to get length of object
         m_IgnoredColliders.AddRange(ownerColliders);
 
         // Handle case of player shooting (make projectiles not go through walls, and remember center-of-screen trajectory)
