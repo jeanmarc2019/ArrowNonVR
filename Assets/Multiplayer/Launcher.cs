@@ -78,12 +78,18 @@ public class Launcher : MonoBehaviourPunCallbacks
 //    }
 //
     public override void OnRoomListUpdate(List<RoomInfo> roomList) {
-        foreach(Transform trans in roomListContent) {
-            Destroy(trans.gameObject);
-        }
         for(int i = 0; i < roomList.Count; i++) {
             Instantiate(roomListItemPrefab, roomListContent).GetComponent<RoomListItemScript>().SetUp(roomList[i]);
 
+        }
+
+        // deleting the default room name button should be done after everything is loaded
+        // another solution: hide the default room name button so that the other room buttons are made
+        //      but the default one is not shown
+        foreach(Transform trans in roomListContent) {
+            if (trans.GetComponent<RoomListItemScript>().delete) {
+                Destroy(trans.gameObject);
+            }
         }
     }
 

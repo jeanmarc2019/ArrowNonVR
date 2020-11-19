@@ -9,10 +9,12 @@ public class RoomListItemScript : MonoBehaviour
 {
     [SerializeField] TMP_Text text;
     RoomInfo info;
+    public bool delete = true;
 
     public void SetUp(RoomInfo _info) {
         info = _info;
         text.text = _info.Name;
+        delete = false;
     }
 
     public void OnClick() {
