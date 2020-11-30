@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
@@ -13,7 +14,10 @@ public class Launcher : MonoBehaviourPunCallbacks
     [SerializeField] TMP_Text errorText;
     [SerializeField] TMP_Text roomNameText;
     [SerializeField] Transform roomListContent;
+    [SerializeField] Transform playerListContent;
     [SerializeField] GameObject roomListItemPrefab;
+    [SerializeField] GameObject playerListItemPrefab;
+    [SerializeField] GameObject startGameButton;
     // Start is called before the first frame update
 
     void Awake(){
@@ -40,12 +44,14 @@ public class Launcher : MonoBehaviourPunCallbacks
     {
         Debug.Log("Connected to Master");
         PhotonNetwork.JoinLobby();
+        PhotonNetwork.AutomaticallySyncScene = true;
     }
 
     public override void OnJoinedLobby()
     {
         MenuManager.Instance.OpenMenu("title");
-        Debug.Log("Joined lobby");
+        PhotonNetwork.NickName = "Player " + UnityEngine.Random.Range(0,1000).ToString("0000");
+        Debug.Log(PhotonNetwork.NickName + " joined lobby");
     }
 
     public void CreateRoom() {
@@ -53,9 +59,39 @@ public class Launcher : MonoBehaviourPunCallbacks
         MenuManager.Instance.OpenMenu("loading");
     }
 
+    public void StartGame() {
+        PhotonNetwork.LoadLevel(3);
+    }
+
     public override void OnJoinedRoom() {
         MenuManager.Instance.OpenMenu("room");
         roomNameText.text = "Room: " +  PhotonNetwork.CurrentRoom.Name;
+
+        Player[] players = PhotonNetwork.PlayerList;
+        for(int i = 0; i < players.Length; i++) {
+            try
+            {
+                Instantiate(playerListItemPrefab, playerListContent).GetComponent<PlayerListItemScript>().SetUp(players[i]);
+            }
+            catch (NullReferenceException e) when (players[i].IsInactive) {
+                Debug.Log("Player is removed");
+            }
+            catch (NullReferenceException e) when (!players[i].IsInactive) {
+                Debug.Log("Player is added");
+            }
+        }
+
+        foreach(Transform trans in playerListContent) {
+            if (trans.GetComponent<PlayerListItemScript>().delete) {
+                Destroy(trans.gameObject);
+            }
+        }
+
+        startGameButton.SetActive(PhotonNetwork.IsMasterClient);
+    }
+
+    public override void OnMasterClientSwitched(Player newMasterClient) {
+        startGameButton.SetActive(PhotonNetwork.IsMasterClient);
     }
 
     public override void OnCreateRoomFailed(short returnCode, string message) {
@@ -79,10 +115,17 @@ public class Launcher : MonoBehaviourPunCallbacks
 //
     public override void OnRoomListUpdate(List<RoomInfo> roomList) {
         for(int i = 0; i < roomList.Count; i++) {
-            Instantiate(roomListItemPrefab, roomListContent).GetComponent<RoomListItemScript>().SetUp(roomList[i]);
-
+            try
+            {
+                Instantiate(roomListItemPrefab, roomListContent).GetComponent<RoomListItemScript>().SetUp(roomList[i]);
+            }
+            catch (MissingReferenceException e) when (roomList[i].RemovedFromList) {
+                Debug.Log("Room is removed");
+            }
+            catch (MissingReferenceException e) when (!roomList[i].RemovedFromList) {
+                Debug.Log("Room is created");
+            }
         }
-
         // deleting the default room name button should be done after everything is loaded
         // another solution: hide the default room name button so that the other room buttons are made
         //      but the default one is not shown
@@ -91,6 +134,10 @@ public class Launcher : MonoBehaviourPunCallbacks
                 Destroy(trans.gameObject);
             }
         }
+    }
+
+    public override void OnPlayerEnteredRoom(Player newPlayer) {
+        Instantiate(playerListItemPrefab, playerListContent).GetComponent<PlayerListItemScript>().SetUp(newPlayer);
     }
 
     // Update is called once per frame
