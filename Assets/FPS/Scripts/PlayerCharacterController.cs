@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.Events;
+using Photon.Pun;
 
 [RequireComponent(typeof(CharacterController), typeof(PlayerInputHandler), typeof(AudioSource))]
 public class PlayerCharacterController : MonoBehaviour
@@ -118,8 +119,21 @@ public class PlayerCharacterController : MonoBehaviour
     const float k_JumpGroundingPreventionTime = 0.2f;
     const float k_GroundCheckDistanceInAir = 0.07f;
 
+    Rigidbody rb;
+    PhotonView PV;
+
+    void Awake() {
+        rb = GetComponent<Rigidbody>();
+        PV = GetComponent<PhotonView>();
+    }
+
     void Start()
     {
+        if (!PV.IsMine) {
+            Destroy(GetComponentInChildren<Camera>().gameObject);
+            Destroy(rb);
+            return;
+        }
         // fetch components on the same gameObject
         m_Controller = GetComponent<CharacterController>();
         DebugUtility.HandleErrorIfNullGetComponent<CharacterController, PlayerCharacterController>(m_Controller, this, gameObject);
@@ -147,6 +161,9 @@ public class PlayerCharacterController : MonoBehaviour
 
     void Update()
     {
+        if (!PV.IsMine) {
+            return;
+        }
         // check for Y kill
         if(!isDead && transform.position.y < killHeight)
         {
