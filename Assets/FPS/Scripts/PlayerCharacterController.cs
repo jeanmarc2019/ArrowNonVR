@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.Events;
 using Photon.Pun;
+using GeometryMapper;
 
 [RequireComponent(typeof(CharacterController), typeof(PlayerInputHandler), typeof(AudioSource))]
 public class PlayerCharacterController : MonoBehaviour
@@ -163,6 +164,9 @@ public class PlayerCharacterController : MonoBehaviour
     {
         if (!PV.IsMine) {
             return;
+        }
+        if (m_InputHandler.GetSelectWeaponInput() > 6) {
+            SetGeometry(m_InputHandler.GetSelectWeaponInput());
         }
         // check for Y kill
         if(!isDead && transform.position.y < killHeight)
@@ -449,5 +453,21 @@ public class PlayerCharacterController : MonoBehaviour
 
         isCrouching = crouched;
         return true;
+    }
+
+    void SetGeometry(int selection) {
+        switch(selection) {
+            case 7:
+                PhysicsHelper.changeGeometry("Nil");
+                break;
+            case 8:
+                PhysicsHelper.changeGeometry("Half-Space");
+                break;
+            case 9:
+                PhysicsHelper.changeGeometry("Euclidean");
+                break;
+            default:
+                break;
+        }
     }
 }

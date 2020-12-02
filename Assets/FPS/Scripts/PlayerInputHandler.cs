@@ -190,6 +190,12 @@ public class PlayerInputHandler : MonoBehaviour
                 return 5;
             else if (Input.GetKeyDown(KeyCode.Alpha6))
                 return 6;
+            else if (Input.GetKeyDown(KeyCode.Alpha7))
+                return 7;
+            else if (Input.GetKeyDown(KeyCode.Alpha8))
+                return 8;
+            else if (Input.GetKeyDown(KeyCode.Alpha9))
+                return 9;
             else
                 return 0;
         }

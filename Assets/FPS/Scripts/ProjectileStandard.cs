@@ -53,11 +53,13 @@ public class ProjectileStandard : MonoBehaviour
     Vector3 m_TrajectoryCorrectionVector;
     Vector3 m_ConsumedTrajectoryCorrectionVector;
     List<Collider> m_IgnoredColliders;
+    string currentGeometry;
 
     const QueryTriggerInteraction k_TriggerInteraction = QueryTriggerInteraction.Collide;
 
     private void OnEnable()
     {
+        currentGeometry = PhysicsHelper.currentGeometry;
         m_ProjectileBase = GetComponent<ProjectileBase>();
         DebugUtility.HandleErrorIfNullGetComponent<ProjectileBase, ProjectileStandard>(m_ProjectileBase, this, gameObject);
 
@@ -108,8 +110,18 @@ public class ProjectileStandard : MonoBehaviour
         }
     }
 
+    void resetValues() {
+        m_ProjectileBase.initialPosition = transform.position;
+        m_ProjectileBase.initialDirection = transform.forward;
+        m_ShootTime = Time.time;
+    }
+
     void Update()
     {
+        if (currentGeometry != PhysicsHelper.currentGeometry) {
+            resetValues();
+            currentGeometry = PhysicsHelper.currentGeometry;
+        }
         float time_since_release = Time.time - m_ShootTime;
 
         transform.position = GeometryMapper.PhysicsHelper.positionMap(
